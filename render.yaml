@@ -14,6 +14,8 @@ services:
         value: smartrp.chatmanager
       - key: DATABASE_PATH
         value: /var/data/bot.db
+        - key: PORT
+        value: 10000
     disk:
       name: data
       mountPath: /var/data
