@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: vk-chat-grid-bot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: VK_TOKEN
+        sync: false
+      - key: OWNER_ID
+        sync: false
+      - key: GROUP_SCREEN_NAME
+        value: smartrp.chatmanager
+      - key: DATABASE_PATH
+        value: /var/data/bot.db
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
