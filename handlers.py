@@ -39,7 +39,7 @@ class Handlers:
                 # can't reliably detect; safe to add
                 added = self.db.add_chat(peer_id)
                 if added:
-                    self.vk.send(peer_id, ' Бот добавлен в сетку бесед.')
+                    self.vk.send(peer_id, 'Бот добавлен в сетку бесед')
         return
 
     def on_command(self, peer_id: int, from_id: int, text: str):
@@ -47,27 +47,27 @@ class Handlers:
         # /add — добавить беседу в сетку
         if cmd in ('/add', '/addgrid'):
             if not self.guard.only_chat_admin(peer_id, from_id) and not self.guard.only_owner(from_id):
-                return self.vk.send(peer_id, ' Только админы могут добавлять беседы.')
+                return self.vk.send(peer_id, 'Только владелец может добавлять беседы')
             added = self.db.add_chat(peer_id)
-            return self.vk.send(peer_id, ' Беседа добавлена в сетку.' if added else 'ℹ️ Беседа уже в сетке.')
+            return self.vk.send(peer_id, 'Беседа добавлена в сетку' if added else 'Беседа уже в сетке')
 
         if cmd in ('/remove', '/removegrid'):
             if not self.guard.only_chat_admin(peer_id, from_id) and not self.guard.only_owner(from_id):
-                return self.vk.send(peer_id, ' Только админы могут удалять беседы.')
+                return self.vk.send(peer_id, 'Только владелец может удалять беседы')
             removed = self.db.remove_chat(peer_id)
-            return self.vk.send(peer_id, ' Беседа удалена из сетки.' if removed else 'ℹ️ Беседа не в сетке.')
+            return self.vk.send(peer_id, 'Беседа удалена из сетки' if removed else 'Беседа не в сетке')
 
         if cmd in ('/grid', '/chats'):
             chats = self.db.list_chats()
-            msg = f' В сетке {len(chats)} бесед.'
+            msg = f'В сетке {len(chats)} бесед'
             return self.vk.send(peer_id, msg)
 
         if cmd in ('/ban',):
             target = extract_user_id(arg)
             if not target:
-                return self.vk.send(peer_id, 'Укажите пользователя: /ban @id или /ban id')
+                return self.vk.send(peer_id, 'Укажите пользователя')
             if not (self.guard.only_chat_admin(peer_id, from_id) or self.guard.only_owner(from_id)):
-                return self.vk.send(peer_id, ' Команда доступна только админам беседы или владельцу.')
+                return self.vk.send(peer_id, 'Команда доступна только админам беседы')
             # add to bans and kick from current chat and all chats in grid
             self.db.add_ban(target)
             # try to remove from this chat
@@ -75,49 +75,49 @@ class Handlers:
             # try to remove from all grid chats
             for p in self.db.list_chats():
                 self.vk.remove_user(p, target)
-            return self.vk.send(peer_id, ' Пользователь добавлен в бан-лист и удалён из сетки (где это возможно).')
+            return self.vk.send(peer_id, 'Пользователь добавлен в бан-лист и удалён из сетки')
 
         if cmd in ('/unban',):
             target = extract_user_id(arg)
             if not target:
-                return self.vk.send(peer_id, 'Укажите пользователя: /unban @id или /unban id')
+                return self.vk.send(peer_id, 'Укажите пользователя')
             if not (self.guard.only_chat_admin(peer_id, from_id) or self.guard.only_owner(from_id)):
-                return self.vk.send(peer_id, ' Команда доступна только админам беседы или владельцу.')
+                return self.vk.send(peer_id, 'Команда доступна только админам беседы')
             self.db.unban(target)
-            return self.vk.send(peer_id, ' Пользователь удалён из бан-листа.')
+            return self.vk.send(peer_id, 'Пользователь удалён из бан-листа')
 
         if cmd in ('/kick',):
             target = extract_user_id(arg)
             if not target:
-                return self.vk.send(peer_id, 'Укажите пользователя: /kick @id или /kick id')
+                return self.vk.send(peer_id, 'Укажите пользователя')
             if not (self.guard.only_chat_admin(peer_id, from_id) or self.guard.only_owner(from_id)):
-                return self.vk.send(peer_id, ' Команда доступна только админам беседы или владельцу.')
+                return self.vk.send(peer_id, 'Команда доступна только админам беседы')
             if not self.guard.protect_targets(peer_id, target):
-                return self.vk.send(peer_id, ' Нельзя удалять админа или владельца беседы.')
+                return self.vk.send(peer_id, 'Нельзя удалять админа или владельца беседы')
             ok, reason = self.vk.remove_user(peer_id, target)
             if ok:
-                return self.vk.send(peer_id, ' Пользователь удалён из беседы.')
+                return self.vk.send(peer_id, 'Пользователь удалён из беседы')
             else:
-                return self.vk.send(peer_id, f' Не удалось удалить пользователя: {reason}')
+                return self.vk.send(peer_id, f'Не удалось удалить пользователя: {reason}')
 
         if cmd in ('/kickall',):
             # Kick user from all chats in grid
             target = extract_user_id(arg)
             if not target:
-                return self.vk.send(peer_id, 'Укажите пользователя: /kickall @id или /kickall id')
+                return self.vk.send(peer_id, 'Укажите пользователя')
             if not (self.guard.only_chat_admin(peer_id, from_id) or self.guard.only_owner(from_id)):
-                return self.vk.send(peer_id, ' Команда доступна только админам беседы или владельцу.')
+                return self.vk.send(peer_id, 'Команда доступна только админам беседы')
             if not self.guard.protect_targets(peer_id, target):
-                return self.vk.send(peer_id, ' Нельзя удалять админа или владельца беседы.')
+                return self.vk.send(peer_id, 'Нельзя удалять админа или владельца беседы')
             failures = []
             for p in self.db.list_chats():
                 ok, reason = self.vk.remove_user(p, target)
                 if not ok:
                     failures.append((p, reason))
             if not failures:
-                return self.vk.send(peer_id, ' Пользователь удалён из всех бесед в сетке.')
+                return self.vk.send(peer_id, 'Пользователь удалён из всех бесед в сетке')
             else:
-                return self.vk.send(peer_id, f'️ Удалось не избавиться от пользователя в {len(failures)} бесед.')
+                return self.vk.send(peer_id, f'️Не удалось избавиться от пользователя в {len(failures)} бесед')
 
         # default unknown command
         return self.vk.send(peer_id, 'Команда не распознана. Доступные: /add, /remove, /grid, /ban, /unban, /kick, /kickall')
