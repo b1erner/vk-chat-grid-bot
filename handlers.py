@@ -1,5 +1,5 @@
-from permissions import is_owner
 from __future__ import annotations
+from permissions import is_owner
 from typing import Dict, List, Tuple, Optional
 from loguru import logger
 from vk_api.bot_longpoll import VkBotEventType
